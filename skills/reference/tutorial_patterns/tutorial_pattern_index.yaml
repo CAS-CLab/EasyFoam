@@ -1,0 +1,445 @@
+source:
+  repository: OpenFOAM/OpenFOAM-13
+  tree: tutorials
+  url: https://github.com/OpenFOAM/OpenFOAM-13/tree/master/tutorials
+  extraction: recursive tree path aggregation
+  concrete_case_names_included: false
+  openfoam_version: "13"
+  source_commit: null
+  generated_at: null
+  generator_version: null
+  provenance_status: unverified
+
+directory_grammar:
+  root: tutorials
+  module_level: "<solver-or-physics-module>"
+  case_level: "<tutorial-case>"
+  required_case_subtrees:
+    - "0/ or <time-directory>/"
+    - constant/
+    - system/
+  common_run_helpers:
+    - Allrun
+    - Allclean
+    - Allmesh
+    - parallel/decomposition helpers
+
+module_patterns:
+  incompressibleFluid:
+    families:
+      - incompressible_flow
+    pattern_tags:
+      - pressure_velocity_coupling
+      - single_phase_transport
+      - turbulence_optional
+      - block_mesh_common
+      - dynamic_mesh_possible
+    expected_file_categories:
+      initial_fields:
+        - velocity
+        - pressure_like
+        - turbulence_optional
+      constant:
+        - physicalProperties
+        - momentumTransport
+      system:
+        - controlDict
+        - fvSchemes
+        - fvSolution
+        - blockMeshDict_or_mesh_import
+
+  fluid:
+    families:
+      - incompressible_flow
+      - mesh_boundary_contracts
+    pattern_tags:
+      - general_fluid_module
+      - pressure_velocity_coupling
+      - thermal_or_source_models_possible
+      - fvModels_possible
+      - fvConstraints_possible
+    expected_file_categories:
+      initial_fields:
+        - velocity
+        - pressure_like
+        - optional_scalar_or_thermal_fields
+      constant:
+        - physicalProperties
+        - momentumTransport
+      system:
+        - controlDict
+        - fvSchemes
+        - fvSolution
+        - mesh_dictionary_or_import_contract
+
+  isothermalFluid:
+    families:
+      - incompressible_flow
+    pattern_tags:
+      - isothermal_single_phase
+      - pressure_velocity_coupling
+      - simple_transport_properties
+    expected_file_categories:
+      initial_fields:
+        - velocity
+        - pressure_like
+      constant:
+        - physicalProperties
+        - momentumTransport
+      system:
+        - controlDict
+        - fvSchemes
+        - fvSolution
+
+  potentialFoam:
+    families:
+      - incompressible_flow
+    pattern_tags:
+      - potential_flow_initialization
+      - preprocessing_or_initial_estimate
+      - minimal_transport_model
+    expected_file_categories:
+      initial_fields:
+        - velocity_or_potential_related
+        - pressure_like_optional
+      system:
+        - controlDict
+        - fvSchemes
+        - fvSolution
+
+  incompressibleVoF:
+    families:
+      - free_surface_vof
+    pattern_tags:
+      - interface_capturing
+      - phase_fraction_transport
+      - gravity_common
+      - set_fields_common
+      - dynamic_mesh_possible
+    expected_file_categories:
+      initial_fields:
+        - velocity
+        - pressure_like
+        - phase_fraction
+      constant:
+        - phaseProperties
+        - momentumTransport
+        - gravity_optional
+      system:
+        - controlDict
+        - fvSchemes
+        - fvSolution
+        - setFieldsDict_common
+
+  incompressibleMultiphaseVoF:
+    families:
+      - free_surface_vof
+    pattern_tags:
+      - multiple_phase_fractions
+      - bounded_interface_transport
+      - set_fields_common
+    expected_file_categories:
+      initial_fields:
+        - velocity
+        - pressure_like
+        - multiple_phase_fraction_fields
+      constant:
+        - phaseProperties
+        - momentumTransport
+      system:
+        - controlDict
+        - fvSchemes
+        - fvSolution
+        - setFieldsDict_common
+
+  incompressibleDriftFlux:
+    families:
+      - free_surface_vof
+    pattern_tags:
+      - drift_flux_multiphase
+      - phase_properties_required
+      - mesh_boundary_contract_sensitive
+    expected_file_categories:
+      initial_fields:
+        - mixture_velocity
+        - pressure_like
+        - phase_fraction_or_related_scalar
+      constant:
+        - phaseProperties
+        - momentumTransport
+      system:
+        - controlDict
+        - fvSchemes
+        - fvSolution
+
+  incompressibleDenseParticleFluid:
+    families:
+      - free_surface_vof
+    pattern_tags:
+      - dense_particle_fluid
+      - particle_phase_properties
+      - mesh_zone_possible
+    expected_file_categories:
+      initial_fields:
+        - fluid_fields
+        - particle_or_phase_fields
+      constant:
+        - physicalProperties
+        - dynamicMeshDict_optional
+      system:
+        - controlDict
+        - fvSchemes
+        - fvSolution
+        - mesh_generation_or_zone_dictionary_optional
+
+  compressibleVoF:
+    families:
+      - free_surface_vof
+      - shock_and_compressible_flow
+    pattern_tags:
+      - compressible_interface_capturing
+      - phase_fraction_transport
+      - thermodynamic_fields
+      - fvModels_possible
+      - fvConstraints_possible
+    expected_file_categories:
+      initial_fields:
+        - velocity
+        - pressure
+        - temperature_or_energy
+        - phase_fraction
+      constant:
+        - phaseProperties
+        - momentumTransport
+        - thermophysical_or_physical_properties
+      system:
+        - controlDict
+        - fvSchemes
+        - fvSolution
+        - setFieldsDict_common
+
+  compressibleMultiphaseVoF:
+    families:
+      - free_surface_vof
+      - shock_and_compressible_flow
+    pattern_tags:
+      - compressible_multiphase_interface
+      - phase_properties_required
+      - parallel_run_possible
+    expected_file_categories:
+      initial_fields:
+        - compressible_flow_fields
+        - phase_fraction_fields
+      constant:
+        - phaseProperties
+        - momentumTransport
+      system:
+        - controlDict
+        - fvSchemes
+        - fvSolution
+        - decomposition_optional
+
+  shockFluid:
+    families:
+      - shock_and_compressible_flow
+    pattern_tags:
+      - shock_capturing
+      - compressible_transient
+      - thermodynamic_fields
+      - stability_sensitive
+    expected_file_categories:
+      initial_fields:
+        - velocity
+        - pressure
+        - temperature_or_energy
+      constant:
+        - physicalProperties
+        - momentumTransport
+      system:
+        - controlDict
+        - fvSchemes
+        - fvSolution
+        - blockMeshDict_or_mesh_import
+
+  multicomponentFluid:
+    families:
+      - multicomponent_reacting_flow
+    pattern_tags:
+      - species_transport
+      - combustion_or_source_models_possible
+      - scalar_boundedness
+      - fvModels_common
+    expected_file_categories:
+      initial_fields:
+        - velocity
+        - pressure_or_thermodynamic_field
+        - species_or_scalar_fields
+      constant:
+        - physicalProperties
+        - momentumTransport
+        - combustionProperties_optional
+      system:
+        - controlDict
+        - fvSchemes
+        - fvSolution
+        - fvModels_optional
+
+  XiFluid:
+    families:
+      - multicomponent_reacting_flow
+    pattern_tags:
+      - premixed_combustion
+      - progress_variable_fields
+      - thermodynamic_fields
+      - dynamic_mesh_possible
+    expected_file_categories:
+      initial_fields:
+        - velocity
+        - pressure
+        - temperature
+        - combustion_progress_or_flame_fields
+      constant:
+        - combustionProperties
+        - physicalProperties
+        - momentumTransport
+      system:
+        - controlDict
+        - fvSchemes
+        - fvSolution
+        - mesh_or_zone_generation_optional
+
+  multiphaseEuler:
+    families:
+      - free_surface_vof
+      - multicomponent_reacting_flow
+    pattern_tags:
+      - Eulerian_multiphase
+      - multiple_phase_models
+      - interphase_closure
+      - fvModels_common
+      - fvConstraints_common
+    expected_file_categories:
+      initial_fields:
+        - phase_velocity_fields
+        - phase_fraction_fields
+        - pressure_like
+      constant:
+        - phaseProperties
+      system:
+        - controlDict
+        - fvSchemes
+        - fvSolution
+        - setFieldsDict_optional
+
+  film:
+    families:
+      - free_surface_vof
+    pattern_tags:
+      - surface_film
+      - coupled_surface_region_possible
+      - liquid_film_transport
+    expected_file_categories:
+      initial_fields:
+        - film_or_surface_fields
+      constant:
+        - film_properties_optional
+      system:
+        - film_solution_controls
+
+  isothermalFilm:
+    families:
+      - free_surface_vof
+    pattern_tags:
+      - isothermal_surface_film
+      - surface_region_transport
+      - simple_thermal_assumption
+    expected_file_categories:
+      initial_fields:
+        - film_or_surface_fields
+      constant:
+        - physicalProperties
+        - momentumTransport
+      system:
+        - controlDict
+        - fvSchemes
+        - fvSolution
+
+  multiRegion:
+    families:
+      - incompressible_flow
+      - multicomponent_reacting_flow
+      - mesh_boundary_contracts
+    pattern_tags:
+      - region_scoped_case_structure
+      - coupled_regions
+      - heat_transfer_or_multiphysics_possible
+      - dynamic_mesh_possible
+    expected_file_categories:
+      initial_fields:
+        - region_scoped_fields
+      constant:
+        - region_scoped_properties
+      system:
+        - region_scoped_solution_controls
+        - region_coupling_controls
+
+  movingMesh:
+    families:
+      - mesh_boundary_contracts
+    pattern_tags:
+      - dynamic_mesh
+      - mesh_motion_controls
+      - topology_or_displacement_sensitive
+    expected_file_categories:
+      initial_fields:
+        - flow_or_motion_fields
+      constant:
+        - dynamicMeshDict
+        - physicalProperties_optional
+      system:
+        - controlDict
+        - fvSchemes
+        - fvSolution
+
+  mesh:
+    families:
+      - mesh_boundary_contracts
+    pattern_tags:
+      - mesh_generation
+      - mesh_conversion
+      - surface_feature_extraction
+      - mesh_quality
+      - no_solver_required_possible
+    expected_file_categories:
+      constant:
+        - polyMesh_or_triSurface_optional
+      system:
+        - blockMeshDict
+        - snappyHexMeshDict_optional
+        - surfaceFeaturesDict_optional
+        - meshQualityDict_optional
+
+  solidDisplacement:
+    families:
+      - mesh_boundary_contracts
+    pattern_tags:
+      - solid_mechanics
+      - displacement_field
+      - mechanical_properties
+      - non_fluid_reference_only
+    expected_file_categories:
+      initial_fields:
+        - displacement_or_stress_related_fields
+      constant:
+        - physical_or_mechanical_properties
+      system:
+        - controlDict
+        - fvSchemes
+        - fvSolution
+
+routing_rules:
+  - If the module maps to multiple families, Workflow Plan must use CaseSpec physics and active fields to choose the minimal family cards.
+  - If only mesh dictionaries are needed, read `mesh_boundary_contracts` and avoid loading flow-family cards.
+  - If thermodynamic fields and phase fractions both appear, read both `free_surface_vof` and `shock_and_compressible_flow`.
+  - If species, progress variables, or combustion dictionaries appear, read `multicomponent_reacting_flow`.
+  - Do not infer numeric values, geometry sizes, material constants, boundary values, or solver controls from this pattern index.

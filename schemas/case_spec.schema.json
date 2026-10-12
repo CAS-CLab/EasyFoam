@@ -1,0 +1,1350 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EasyFoam OpenFOAM-13 Case Specification",
+  "description": "Auditable planning contract produced before case authoring. Schema validity does not by itself release a case to Write; semantic release also requires no unresolved blocking review item.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "case_id",
+    "case_name",
+    "openfoam_version",
+    "description",
+    "user_requirement_ref",
+    "requirement_fidelity",
+    "physics",
+    "solver",
+    "geometry",
+    "mesh",
+    "fields",
+    "boundary_patches",
+    "material_properties",
+    "numerics",
+    "run",
+    "outputs",
+    "validation",
+    "assumptions",
+    "review_required",
+    "evidence_sources"
+  ],
+  "properties": {
+    "schema_version": {
+      "enum": [
+        "1.1",
+        "1.2"
+      ]
+    },
+    "case_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "case_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "openfoam_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string"
+    },
+    "user_requirement_ref": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/relative_ref"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "requirement_fidelity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "source_ref",
+        "parameters",
+        "items",
+        "unresolved_decisive"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "complete",
+            "review_required",
+            "blocked"
+          ]
+        },
+        "source_ref": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/relative_ref"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/provenance_value"
+          }
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/requirement_item"
+          }
+        },
+        "unresolved_decisive": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "physics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "phase_regime",
+        "compressibility",
+        "energy",
+        "species",
+        "flow_time",
+        "turbulence",
+        "rotating_or_moving_frame",
+        "gravity",
+        "notes"
+      ],
+      "properties": {
+        "phase_regime": {
+          "enum": [
+            "single_phase",
+            "multiphase",
+            "unknown"
+          ]
+        },
+        "compressibility": {
+          "enum": [
+            "incompressible",
+            "compressible",
+            "low_mach",
+            "unknown"
+          ]
+        },
+        "energy": {
+          "enum": [
+            "on",
+            "off",
+            "unknown"
+          ]
+        },
+        "species": {
+          "enum": [
+            "on",
+            "off",
+            "unknown"
+          ]
+        },
+        "flow_time": {
+          "enum": [
+            "steady",
+            "transient",
+            "unknown"
+          ]
+        },
+        "turbulence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "simulation_type",
+            "model",
+            "wall_treatment"
+          ],
+          "properties": {
+            "simulation_type": {
+              "enum": [
+                "laminar",
+                "RAS",
+                "LES",
+                "DNS",
+                "unknown"
+              ]
+            },
+            "model": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "wall_treatment": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "rotating_or_moving_frame": {
+          "enum": [
+            "none",
+            "MRF",
+            "moving_mesh",
+            "overset",
+            "unknown"
+          ]
+        },
+        "gravity": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "solver": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "execution",
+        "module",
+        "application",
+        "legacy_equivalent",
+        "algorithm",
+        "dictionary_family",
+        "selection_basis"
+      ],
+      "properties": {
+        "execution": {
+          "enum": [
+            "foamRun",
+            "legacy",
+            "unknown"
+          ]
+        },
+        "module": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "application": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "legacy_equivalent": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "algorithm": {
+          "enum": [
+            "PIMPLE",
+            "PISO",
+            "SIMPLE",
+            "not_applicable",
+            "unknown"
+          ]
+        },
+        "dictionary_family": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "selection_basis": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/relative_ref"
+          }
+        }
+      }
+    },
+    "geometry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_type",
+        "complexity",
+        "source_refs",
+        "units",
+        "body_kind",
+        "review_required"
+      ],
+      "properties": {
+        "source_type": {
+          "enum": [
+            "parametric",
+            "surface_file",
+            "cad",
+            "external_mesh",
+            "existing_case",
+            "unspecified"
+          ]
+        },
+        "complexity": {
+          "enum": [
+            "simple",
+            "complex",
+            "external",
+            "unknown"
+          ]
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/relative_ref"
+          }
+        },
+        "units": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "body_kind": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "characteristic_length": {
+          "$ref": "#/$defs/provenance_value"
+        },
+        "bounds": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "x": {
+              "$ref": "#/$defs/range"
+            },
+            "y": {
+              "$ref": "#/$defs/range"
+            },
+            "z": {
+              "$ref": "#/$defs/range"
+            }
+          }
+        },
+        "reference_axes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "review_required": {
+          "type": "boolean"
+        }
+      }
+    },
+    "mesh": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "route",
+        "method",
+        "dimensionality",
+        "required_patches",
+        "required_cell_zones",
+        "required_face_zones",
+        "quality_policy",
+        "source_refs"
+      ],
+      "properties": {
+        "route": {
+          "enum": [
+            "generate",
+            "import",
+            "reuse",
+            "unknown"
+          ]
+        },
+        "method": {
+          "enum": [
+            "blockMesh",
+            "snappyHexMesh",
+            "external",
+            "combined",
+            "existing_polyMesh",
+            "unknown"
+          ]
+        },
+        "dimensionality": {
+          "enum": [
+            "2D",
+            "axisymmetric",
+            "3D",
+            "unknown"
+          ]
+        },
+        "required_patches": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/patch_contract"
+          }
+        },
+        "required_cell_zones": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "required_face_zones": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "domain_extent": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "x": {
+              "$ref": "#/$defs/range"
+            },
+            "y": {
+              "$ref": "#/$defs/range"
+            },
+            "z": {
+              "$ref": "#/$defs/range"
+            }
+          }
+        },
+        "quality_policy": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": [
+            "check_mesh_required",
+            "blocking_failures"
+          ],
+          "properties": {
+            "check_mesh_required": {
+              "type": "boolean"
+            },
+            "blocking_failures": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/relative_ref"
+          }
+        }
+      }
+    },
+    "fields": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/field_contract"
+      }
+    },
+    "boundary_patches": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/boundary_patch"
+      }
+    },
+    "material_properties": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entries",
+        "models"
+      ],
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/property_contract"
+          }
+        },
+        "models": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "numerics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "algorithm",
+        "schemes",
+        "linear_solvers",
+        "correctors",
+        "relaxation",
+        "time_step_policy",
+        "source_refs"
+      ],
+      "properties": {
+        "algorithm": {
+          "enum": [
+            "PIMPLE",
+            "PISO",
+            "SIMPLE",
+            "not_applicable",
+            "unknown"
+          ]
+        },
+        "schemes": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "linear_solvers": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "correctors": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "relaxation": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "time_step_policy": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "source_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/relative_ref"
+          }
+        }
+      }
+    },
+    "run": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "preprocessing_commands",
+        "solver_command",
+        "controls",
+        "parallel",
+        "restart_policy",
+        "formal_controls_preserved"
+      ],
+      "properties": {
+        "preprocessing_commands": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "solver_command": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "controls": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "start_from",
+            "start_time",
+            "end_time",
+            "delta_t",
+            "adjust_time_step",
+            "max_co",
+            "write_control",
+            "write_interval"
+          ],
+          "properties": {
+            "start_from": {
+              "$ref": "#/$defs/provenance_value"
+            },
+            "start_time": {
+              "$ref": "#/$defs/provenance_value"
+            },
+            "end_time": {
+              "$ref": "#/$defs/provenance_value"
+            },
+            "delta_t": {
+              "$ref": "#/$defs/provenance_value"
+            },
+            "adjust_time_step": {
+              "$ref": "#/$defs/provenance_value"
+            },
+            "max_co": {
+              "$ref": "#/$defs/provenance_value"
+            },
+            "write_control": {
+              "$ref": "#/$defs/provenance_value"
+            },
+            "write_interval": {
+              "$ref": "#/$defs/provenance_value"
+            }
+          }
+        },
+        "parallel": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "enabled",
+            "processes"
+          ],
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "processes": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 1
+            }
+          }
+        },
+        "restart_policy": {
+          "enum": [
+            "fresh",
+            "resume_latest",
+            "user_selected",
+            "unknown"
+          ]
+        },
+        "formal_controls_preserved": {
+          "type": "boolean"
+        }
+      }
+    },
+    "outputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "qois",
+        "diagnostics",
+        "visuals"
+      ],
+      "properties": {
+        "qois": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/qoi_contract"
+          }
+        },
+        "diagnostics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "visuals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/visual_request"
+          }
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "checks",
+        "claim_boundaries"
+      ],
+      "properties": {
+        "checks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/validation_contract"
+          }
+        },
+        "claim_boundaries": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/assumption"
+      }
+    },
+    "review_required": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required",
+        "items"
+      ],
+      "properties": {
+        "required": {
+          "type": "boolean"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/review_item"
+          }
+        }
+      }
+    },
+    "evidence_sources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/evidence_source"
+      }
+    }
+  },
+  "$defs": {
+    "relative_ref": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?![A-Za-z]:[\\\\/]).+"
+    },
+    "range": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ],
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "provenance_value": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "source"
+      ],
+      "properties": {
+        "value": {},
+        "unit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source": {
+          "enum": [
+            "user_explicit",
+            "user_approved",
+            "derived",
+            "reference_default",
+            "existing_case",
+            "review_required"
+          ]
+        },
+        "evidence_ref": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/relative_ref"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "rationale": {
+          "type": "string"
+        },
+        "raw_text": {
+          "type": "string"
+        }
+      }
+    },
+    "requirement_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_id",
+        "category",
+        "statement",
+        "status",
+        "decisive",
+        "mapped_targets",
+        "evidence_refs"
+      ],
+      "properties": {
+        "requirement_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "category": {
+          "type": "string",
+          "minLength": 1
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "captured",
+            "derived",
+            "defaulted",
+            "missing",
+            "conflicting",
+            "deferred",
+            "not_applicable"
+          ]
+        },
+        "decisive": {
+          "type": "boolean"
+        },
+        "parameter": {
+          "$ref": "#/$defs/provenance_value"
+        },
+        "mapped_targets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/relative_ref"
+          }
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "patch_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "mesh_type",
+        "physical_role",
+        "required"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mesh_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "physical_role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required": {
+          "type": "boolean"
+        }
+      }
+    },
+    "field_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "role",
+        "required"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "class": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "dimensions": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "role": {
+          "enum": [
+            "solved",
+            "derived",
+            "auxiliary"
+          ]
+        },
+        "initial_condition": {
+          "$ref": "#/$defs/provenance_value"
+        },
+        "required": {
+          "type": "boolean"
+        }
+      }
+    },
+    "boundary_patch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "mesh_type",
+        "physical_role",
+        "source",
+        "field_conditions"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mesh_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "physical_role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "enum": [
+            "user_explicit",
+            "user_approved",
+            "derived",
+            "existing_mesh",
+            "review_required"
+          ]
+        },
+        "field_conditions": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/boundary_condition"
+          }
+        }
+      }
+    },
+    "boundary_condition": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "type",
+        "source"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "enum": [
+            "user_explicit",
+            "user_approved",
+            "derived",
+            "reference_default",
+            "existing_case",
+            "review_required"
+          ]
+        },
+        "value": {},
+        "evidence_ref": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/relative_ref"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "property_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "value",
+        "unit",
+        "source",
+        "required"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value": {},
+        "unit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "dimensions": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source": {
+          "enum": [
+            "user_explicit",
+            "user_approved",
+            "derived",
+            "reference_default",
+            "existing_case",
+            "review_required"
+          ]
+        },
+        "evidence_ref": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/relative_ref"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "required": {
+          "type": "boolean"
+        }
+      }
+    },
+    "qoi_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "qoi_id",
+        "kind",
+        "method",
+        "required"
+      ],
+      "properties": {
+        "qoi_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "field": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "location": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "unit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "method": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "acceptance_criterion": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sampling_or_aggregation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "visual_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "visual_id",
+        "kind",
+        "field",
+        "purpose",
+        "required"
+      ],
+      "properties": {
+        "visual_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "field": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required": {
+          "type": "boolean"
+        }
+      }
+    },
+    "validation_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "check_id",
+        "category",
+        "metric",
+        "criterion",
+        "required",
+        "evidence_plan"
+      ],
+      "properties": {
+        "check_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "category": {
+          "enum": [
+            "requirement",
+            "file",
+            "mesh",
+            "runtime",
+            "numerical",
+            "physical",
+            "qoi",
+            "visual"
+          ]
+        },
+        "metric": {
+          "type": "string",
+          "minLength": 1
+        },
+        "criterion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "evidence_plan": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "assumption": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "assumption_id",
+        "statement",
+        "source",
+        "impact",
+        "status"
+      ],
+      "properties": {
+        "assumption_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "enum": [
+            "derived",
+            "reference_default",
+            "user_approved",
+            "existing_case"
+          ]
+        },
+        "impact": {
+          "enum": [
+            "non_blocking",
+            "blocking_until_review"
+          ]
+        },
+        "status": {
+          "enum": [
+            "active",
+            "accepted",
+            "rejected",
+            "superseded"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/relative_ref"
+          }
+        }
+      }
+    },
+    "review_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "review_id",
+        "category",
+        "question",
+        "blocking",
+        "status"
+      ],
+      "properties": {
+        "review_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "category": {
+          "type": "string",
+          "minLength": 1
+        },
+        "question": {
+          "type": "string",
+          "minLength": 1
+        },
+        "blocking": {
+          "type": "boolean"
+        },
+        "status": {
+          "enum": [
+            "open",
+            "resolved",
+            "deferred"
+          ]
+        },
+        "resolution": {
+          "type": "string"
+        }
+      }
+    },
+    "evidence_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id",
+        "kind",
+        "ref",
+        "role"
+      ],
+      "properties": {
+        "source_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "runtime_prompt",
+            "user_requirement_file",
+            "user_requirement",
+            "user_artifact",
+            "reference",
+            "tutorial",
+            "existing_case",
+            "derived_analysis"
+          ]
+        },
+        "ref": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/relative_ref"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "runtime_prompt"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "ref": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "user_requirement",
+                  "user_requirement_file",
+                  "user_artifact",
+                  "reference",
+                  "tutorial",
+                  "existing_case"
+                ]
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "properties": {
+              "ref": {
+                "$ref": "#/$defs/relative_ref"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

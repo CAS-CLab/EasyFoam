@@ -1,0 +1,52 @@
+incompressibleFluid:
+  - incompressible_flow
+incompressibleVoF:
+  - free_surface_vof
+incompressibleMultiphaseVoF:
+  - free_surface_vof
+incompressibleDriftFlux:
+  - free_surface_vof
+incompressibleDenseParticleFluid:
+  - free_surface_vof
+compressibleVoF:
+  - free_surface_vof
+  - shock_and_compressible_flow
+compressibleMultiphaseVoF:
+  - free_surface_vof
+  - shock_and_compressible_flow
+shockFluid:
+  - shock_and_compressible_flow
+fluid:
+  - incompressible_flow
+  - mesh_boundary_contracts
+isothermalFluid:
+  - incompressible_flow
+potentialFoam:
+  - incompressible_flow
+multicomponentFluid:
+  - multicomponent_reacting_flow
+XiFluid:
+  - multicomponent_reacting_flow
+multiphaseEuler:
+  - free_surface_vof
+  - multicomponent_reacting_flow
+film:
+  - free_surface_vof
+isothermalFilm:
+  - free_surface_vof
+multiRegion:
+  - incompressible_flow
+  - multicomponent_reacting_flow
+  - mesh_boundary_contracts
+movingMesh:
+  - mesh_boundary_contracts
+mesh:
+  - mesh_boundary_contracts
+solidDisplacement:
+  - mesh_boundary_contracts
+legacy:
+  - incompressible_flow
+  - free_surface_vof
+  - shock_and_compressible_flow
+  - multicomponent_reacting_flow
+  - mesh_boundary_contracts

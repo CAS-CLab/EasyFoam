@@ -1,0 +1,442 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EasyFoam Workflow State",
+  "description": "Minimal authoritative coordination state for one user-scoped Workflow.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "workflow_id",
+    "case_id",
+    "openfoam_version",
+    "requested_scope",
+    "status",
+    "active_or_last_stage",
+    "completed_scope",
+    "artifacts",
+    "decisive_evidence",
+    "limitations_or_blockers",
+    "next_action",
+    "created_at",
+    "updated_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "enum": [
+        "2.1",
+        "2.2"
+      ]
+    },
+    "workflow_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "case_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "openfoam_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "requested_scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "goal",
+        "stages",
+        "outputs"
+      ],
+      "properties": {
+        "goal": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target_ref": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/relativePath"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "stages": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "plan",
+              "write",
+              "run",
+              "postprocess"
+            ]
+          }
+        },
+        "outputs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "extensions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "stage",
+              "reason",
+              "recorded_at"
+            ],
+            "properties": {
+              "stage": {
+                "enum": [
+                  "plan",
+                  "write",
+                  "run",
+                  "postprocess"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              },
+              "recorded_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "enum": [
+        "in_progress",
+        "succeeded",
+        "failed",
+        "blocked"
+      ]
+    },
+    "active_or_last_stage": {
+      "enum": [
+        "plan",
+        "write",
+        "run",
+        "postprocess",
+        "complete"
+      ]
+    },
+    "active_specialist": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/relativePath"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "completed_scope": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "plan",
+          "write",
+          "run",
+          "postprocess"
+        ]
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "case_spec",
+        "formal_case",
+        "run_records",
+        "evidence_summary",
+        "requested_outputs",
+        "experience_records"
+      ],
+      "properties": {
+        "case_spec": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/relativePath"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "formal_case": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/formalCase"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "run_records": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/relativePath"
+          }
+        },
+        "evidence_summary": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/relativePath"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "requested_outputs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/relativePath"
+          }
+        },
+        "experience_records": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/relativePath"
+          }
+        }
+      }
+    },
+    "decisive_evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/evidenceRef"
+      }
+    },
+    "limitations_or_blockers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/limitation"
+      }
+    },
+    "next_action": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/nextAction"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "$defs": {
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*(?:^|/)\\.\\.(?:/|$)).+"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "formalCase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "content_sha256",
+        "input_sha256",
+        "mesh_sha256",
+        "initial_state_sha256"
+      ],
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "content_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "mesh_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "input_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "initial_state_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "evidenceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claim",
+        "status",
+        "ref",
+        "summary"
+      ],
+      "properties": {
+        "claim": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_stage": {
+          "enum": [
+            "plan",
+            "write",
+            "run",
+            "postprocess"
+          ]
+        },
+        "status": {
+          "enum": [
+            "passed",
+            "failed",
+            "blocked",
+            "limited",
+            "not_assessed"
+          ]
+        },
+        "ref": {
+          "$ref": "#/$defs/relativePath"
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "limitation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "summary",
+        "source_stage"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "limitation",
+            "blocker"
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_stage": {
+          "enum": [
+            "plan",
+            "write",
+            "run",
+            "postprocess"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/relativePath"
+          }
+        }
+      }
+    },
+    "nextAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target_stage",
+        "reason"
+      ],
+      "properties": {
+        "target_stage": {
+          "enum": [
+            "plan",
+            "write",
+            "run",
+            "postprocess"
+          ]
+        },
+        "target_specialist": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/relativePath"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "succeeded"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "active_or_last_stage": {
+            "const": "complete"
+          },
+          "next_action": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "in_progress"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "next_action": {
+            "$ref": "#/$defs/nextAction"
+          }
+        }
+      }
+    }
+  ]
+}

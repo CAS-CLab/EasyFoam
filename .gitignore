@@ -1,0 +1,59 @@
+# Local configuration and credentials.
+.env
+.env.*
+!.env.example
+codex_state/
+.codex/
+.claude/
+.agents/
+.vscode/
+.idea/
+*.pem
+*.key
+
+# Python environments, caches, and temporary files.
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.pytest_tmp/
+.mypy_cache/
+.ruff_cache/
+.tmp*/
+tmp/
+temp/
+
+# Local task and evolution products.
+/runs/
+/outputs/
+/results/
+/experiences/
+/candidates/
+/decisions/
+/archive/
+*.log
+processor[0-9]*/
+/postProcessing/
+dynamicCode/
+
+# Research-only content excluded from the library release.
+/benchmarks/
+/baselines/
+/configs/
+/tests/
+/reports/
+/scripts/evolution_*.py
+/skills/evolution/engine/
+/skills/evolution/scripts/run_core_evolution.py
+/schemas/benchmark_*.schema.json
+/schemas/evolution_campaign.schema.json
+/schemas/evolution_split_manifest.schema.json
+/schemas/foambench_*.schema.json
+/schemas/qoi_recovery_plan.schema.json
+*.zip
+
+# Operating-system files.
+.DS_Store
+Thumbs.db
+Desktop.ini

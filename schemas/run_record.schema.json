@@ -1,0 +1,329 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EasyFoam Run Record",
+  "description": "One immutable record for one actual preprocessing/solver attempt. Command logs are referenced, not embedded.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "attempt_id",
+    "workflow_id",
+    "case_id",
+    "mode",
+    "case_ref",
+    "case_sha256",
+    "input_sha256",
+    "mesh_sha256",
+    "environment",
+    "commands",
+    "terminal_status",
+    "produced_output_refs",
+    "started_at",
+    "completed_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.1"
+    },
+    "attempt_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "workflow_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "case_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mode": {
+      "enum": [
+        "formal",
+        "smoke",
+        "diagnostic",
+        "resume"
+      ]
+    },
+    "case_ref": {
+      "$ref": "#/$defs/relative_ref"
+    },
+    "case_sha256": {
+      "type": "string",
+      "pattern": "^[a-fA-F0-9]{64}$"
+    },
+    "modifications": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "available"
+      ],
+      "properties": {
+        "available": {
+          "type": "boolean"
+        },
+        "openfoam_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "commands": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/command"
+      }
+    },
+    "terminal_status": {
+      "enum": [
+        "succeeded",
+        "failed",
+        "blocked"
+      ]
+    },
+    "terminal_reason": {
+      "type": "string"
+    },
+    "completed_time_or_iteration": {
+      "type": [
+        "string",
+        "number",
+        "integer",
+        "null"
+      ]
+    },
+    "first_deterministic_error": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "runtime_summary": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "produced_output_refs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/relative_ref"
+      }
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "input_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "mesh_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "restart": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "parent_attempt_ref",
+        "restart_time",
+        "restart_state_sha256",
+        "compatibility_status"
+      ],
+      "properties": {
+        "parent_attempt_ref": {
+          "$ref": "#/$defs/relative_ref"
+        },
+        "restart_time": {
+          "type": "string",
+          "minLength": 1
+        },
+        "restart_state_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "compatibility_status": {
+          "const": "passed"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "relative_ref": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*(?:^|/)\\.\\.(?:/|$)).+"
+    },
+    "command": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "argv",
+        "cwd",
+        "started_at",
+        "completed_at",
+        "return_code",
+        "stdout_ref",
+        "stderr_ref"
+      ],
+      "properties": {
+        "argv": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "cwd": {
+          "$ref": "#/$defs/relative_ref"
+        },
+        "started_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "completed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "elapsed_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "return_code": {
+          "type": "integer"
+        },
+        "stdout_ref": {
+          "$ref": "#/$defs/relative_ref"
+        },
+        "stderr_ref": {
+          "$ref": "#/$defs/relative_ref"
+        }
+      }
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "terminal_status": {
+            "const": "succeeded"
+          }
+        },
+        "required": [
+          "terminal_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "commands": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "enum": [
+              "formal",
+              "resume"
+            ]
+          },
+          "terminal_status": {
+            "const": "succeeded"
+          }
+        },
+        "required": [
+          "mode",
+          "terminal_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "runtime_summary": {
+            "type": "object",
+            "required": [
+              "command_chain_status",
+              "formal_terminal_status"
+            ],
+            "properties": {
+              "command_chain_status": {
+                "const": "succeeded"
+              },
+              "formal_terminal_status": {
+                "const": "passed"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "enum": [
+              "smoke",
+              "diagnostic"
+            ]
+          },
+          "terminal_status": {
+            "const": "succeeded"
+          }
+        },
+        "required": [
+          "mode",
+          "terminal_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "runtime_summary": {
+            "type": "object",
+            "required": [
+              "formal_terminal_status"
+            ],
+            "properties": {
+              "formal_terminal_status": {
+                "const": "not_applicable"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "resume"
+          }
+        },
+        "required": [
+          "mode"
+        ]
+      },
+      "then": {
+        "required": [
+          "restart"
+        ]
+      }
+    }
+  ]
+}

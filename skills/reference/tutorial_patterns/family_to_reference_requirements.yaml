@@ -1,0 +1,70 @@
+incompressible_flow:
+  solver_modules:
+    - incompressibleFluid
+    - fluid
+    - isothermalFluid
+    - potentialFoam
+  family_cards:
+    - incompressible_flow
+    - mesh_boundary_contracts
+  tutorial_pattern_categories:
+    - incompressible pressure-velocity flow
+    - potential-flow initialization
+    - isothermal single-phase flow
+
+free_surface_vof:
+  solver_modules:
+    - incompressibleVoF
+    - incompressibleMultiphaseVoF
+    - incompressibleDriftFlux
+    - incompressibleDenseParticleFluid
+    - compressibleVoF
+    - compressibleMultiphaseVoF
+    - multiphaseEuler
+    - film
+    - isothermalFilm
+  family_cards:
+    - free_surface_vof
+    - mesh_boundary_contracts
+  tutorial_pattern_categories:
+    - free-surface or interface-capturing flow
+    - Eulerian multiphase flow
+    - film flow
+
+shock_and_compressible_flow:
+  solver_modules:
+    - shockFluid
+    - compressibleVoF
+    - compressibleMultiphaseVoF
+  family_cards:
+    - shock_and_compressible_flow
+    - mesh_boundary_contracts
+  tutorial_pattern_categories:
+    - compressible or shock flow
+    - compressible multiphase interface flow
+
+multicomponent_reacting_flow:
+  solver_modules:
+    - multicomponentFluid
+    - XiFluid
+    - multiphaseEuler
+  family_cards:
+    - multicomponent_reacting_flow
+    - mesh_boundary_contracts
+  tutorial_pattern_categories:
+    - multicomponent or combustion flow
+    - Eulerian multiphase flow
+
+mesh_boundary_contracts:
+  solver_modules:
+    - mesh
+    - movingMesh
+    - multiRegion
+    - solidDisplacement
+  family_cards:
+    - mesh_boundary_contracts
+  tutorial_pattern_categories:
+    - mesh-only workflows
+    - moving mesh
+    - multi-region flow and heat transfer
+    - solid displacement

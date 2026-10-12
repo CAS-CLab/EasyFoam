@@ -1,0 +1,390 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EasyFoam Evidence Summary",
+  "description": "Final user-facing synthesis of requirement, case, mesh, execution, credibility, QoI, and requested output evidence.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "workflow_id",
+    "case_id",
+    "workflow_status",
+    "overall",
+    "assessments",
+    "qoi_results",
+    "required_outputs",
+    "limitations",
+    "claim_boundaries",
+    "user_review"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "2.1"
+    },
+    "workflow_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "case_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "workflow_status": {
+      "enum": [
+        "in_progress",
+        "succeeded",
+        "failed",
+        "blocked"
+      ]
+    },
+    "overall": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "highest_supported_claim",
+        "summary"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "passed",
+            "limited",
+            "failed",
+            "blocked",
+            "not_assessed"
+          ]
+        },
+        "highest_supported_claim": {
+          "enum": [
+            "none",
+            "case_defined",
+            "case_materialized",
+            "mesh_credible",
+            "executed",
+            "numerically_credible",
+            "physically_credible",
+            "validated_for_requested_qois"
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "assessments": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement",
+        "case_contract",
+        "mesh",
+        "execution",
+        "numerical",
+        "physical",
+        "visual"
+      ],
+      "properties": {
+        "requirement": {
+          "$ref": "#/$defs/assessment"
+        },
+        "case_contract": {
+          "$ref": "#/$defs/assessment"
+        },
+        "mesh": {
+          "$ref": "#/$defs/assessment"
+        },
+        "execution": {
+          "$ref": "#/$defs/assessment"
+        },
+        "numerical": {
+          "$ref": "#/$defs/assessment"
+        },
+        "physical": {
+          "$ref": "#/$defs/assessment"
+        },
+        "visual": {
+          "$ref": "#/$defs/assessment"
+        }
+      }
+    },
+    "qoi_results": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/qoi"
+      }
+    },
+    "required_outputs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/output"
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "claim_boundaries": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "user_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required",
+        "items"
+      ],
+      "properties": {
+        "required": {
+          "type": "boolean"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*(?:^|/)\\.\\.(?:/|$)).+"
+    },
+    "status": {
+      "enum": [
+        "passed",
+        "limited",
+        "failed",
+        "blocked",
+        "not_assessed",
+        "not_applicable"
+      ]
+    },
+    "assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "summary",
+        "status_basis",
+        "evidence_refs",
+        "limitations"
+      ],
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/status"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "status_basis": {
+          "type": "string"
+        },
+        "observations": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/relativePath"
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "passed",
+                  "failed",
+                  "blocked"
+                ]
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "status_basis": {
+                "type": "string",
+                "minLength": 1
+              },
+              "evidence_refs": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/$defs/relativePath"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "qoi": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "status",
+        "value",
+        "unit",
+        "method",
+        "acceptance_criterion",
+        "status_basis",
+        "summary",
+        "evidence_refs"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        },
+        "value": {},
+        "unit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "method": {
+          "type": "string"
+        },
+        "acceptance_criterion": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status_basis": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/relativePath"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "passed",
+                  "failed"
+                ]
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "acceptance_criterion": {
+                "type": "string",
+                "minLength": 1
+              },
+              "status_basis": {
+                "type": "string",
+                "minLength": 1
+              },
+              "evidence_refs": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/$defs/relativePath"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "status",
+        "path",
+        "summary"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "available",
+            "failed",
+            "blocked",
+            "not_applicable"
+          ]
+        },
+        "path": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/relativePath"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "summary": {
+          "type": "string"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "available"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "path": {
+                "$ref": "#/$defs/relativePath"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

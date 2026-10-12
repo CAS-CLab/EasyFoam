@@ -1,0 +1,867 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EasyFoam Candidate Patch",
+  "description": "One atomic, reviewable, reversible proposed system change.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "candidate_id",
+    "status",
+    "source_experience_refs",
+    "primary_target",
+    "target_changes",
+    "problem_pattern",
+    "behavior_before",
+    "behavior_after",
+    "scope",
+    "patch_ref",
+    "patch_sha256",
+    "validation",
+    "evidence_level",
+    "risks",
+    "rollback",
+    "created_at",
+    "updated_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "2.1"
+    },
+    "candidate_id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9._-]+$"
+    },
+    "candidate_type": {
+      "enum": [
+        "behavioral",
+        "documentation_only",
+        "diagnostic"
+      ],
+      "description": "Classification used to keep documentation/diagnostic changes out of the performance-improvement track."
+    },
+    "touched_runtime_surface": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/relativePath"
+      }
+    },
+    "status": {
+      "enum": [
+        "draft",
+        "frozen",
+        "validated",
+        "invalid",
+        "superseded"
+      ]
+    },
+    "source_experience_refs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/relativePath"
+      }
+    },
+    "primary_target": {
+      "$ref": "#/$defs/relativePath"
+    },
+    "target_changes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "target_kind",
+          "change_type",
+          "base_sha256",
+          "proposed_sha256"
+        ],
+        "properties": {
+          "path": {
+            "$ref": "#/$defs/relativePath"
+          },
+          "target_kind": {
+            "enum": [
+              "skill",
+              "reference",
+              "script",
+              "schema"
+            ]
+          },
+          "change_type": {
+            "enum": [
+              "add",
+              "modify",
+              "delete"
+            ]
+          },
+          "base_sha256": {
+            "description": "SHA-256 of LF-normalized target text before applying the Candidate; null only for additions.",
+            "oneOf": [
+              {
+                "$ref": "#/$defs/sha256"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "proposed_sha256": {
+            "description": "SHA-256 of LF-normalized target text after applying the Candidate; null only for deletions.",
+            "oneOf": [
+              {
+                "$ref": "#/$defs/sha256"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "problem_pattern": {
+      "type": "string",
+      "minLength": 1
+    },
+    "behavior_before": {
+      "type": "string",
+      "minLength": 1
+    },
+    "behavior_after": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "applicability",
+        "exclusions"
+      ],
+      "properties": {
+        "applicability": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "exclusions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "patch_ref": {
+      "$ref": "#/$defs/relativePath"
+    },
+    "patch_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "plan",
+        "results"
+      ],
+      "properties": {
+        "plan": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "structural",
+            "source_replay",
+            "holdout",
+            "negative_controls",
+            "compatibility",
+            "cross_scope"
+          ],
+          "properties": {
+            "structural": {
+              "const": true
+            },
+            "source_replay": {
+              "type": "boolean"
+            },
+            "holdout": {
+              "type": "boolean"
+            },
+            "negative_controls": {
+              "type": "boolean"
+            },
+            "compatibility": {
+              "type": "boolean"
+            },
+            "cross_scope": {
+              "type": "boolean"
+            }
+          }
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind",
+              "status",
+              "summary",
+              "evidence_refs",
+              "recorded_at"
+            ],
+            "properties": {
+              "kind": {
+                "enum": [
+                  "structural",
+                  "source",
+                  "holdout",
+                  "negative",
+                  "compatibility",
+                  "cross_scope"
+                ]
+              },
+              "status": {
+                "enum": [
+                  "passed",
+                  "failed",
+                  "limited",
+                  "blocked",
+                  "not_run"
+                ]
+              },
+              "summary": {
+                "type": "string",
+                "minLength": 1
+              },
+              "evidence_refs": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/relativePath"
+                }
+              },
+              "recorded_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      }
+    },
+    "evidence_level": {
+      "enum": [
+        "E1_VERIFIED_SOURCE",
+        "E2_REPEATED_SOURCE",
+        "E3_SOURCE_REPLAY",
+        "E4_HOLDOUT_SUPPORT",
+        "E5_CROSS_SCOPE_SUPPORT"
+      ]
+    },
+    "risks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method"
+      ],
+      "properties": {
+        "method": {
+          "const": "reverse_same_patch"
+        }
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "$defs": {
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?![A-Za-z]:[\\\\/])(?!.*(?:^|/)\\.\\.(?:/|$)).+"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "evidence_level": {
+            "enum": [
+              "E2_REPEATED_SOURCE",
+              "E3_SOURCE_REPLAY",
+              "E4_HOLDOUT_SUPPORT",
+              "E5_CROSS_SCOPE_SUPPORT"
+            ]
+          }
+        },
+        "required": [
+          "evidence_level"
+        ]
+      },
+      "then": {
+        "properties": {
+          "source_experience_refs": {
+            "minItems": 2
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "evidence_level": {
+            "enum": [
+              "E3_SOURCE_REPLAY",
+              "E4_HOLDOUT_SUPPORT",
+              "E5_CROSS_SCOPE_SUPPORT"
+            ]
+          }
+        },
+        "required": [
+          "evidence_level"
+        ]
+      },
+      "then": {
+        "properties": {
+          "validation": {
+            "properties": {
+              "results": {
+                "allOf": [
+                  {
+                    "contains": {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "const": "structural"
+                        },
+                        "status": {
+                          "const": "passed"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "status"
+                      ]
+                    }
+                  },
+                  {
+                    "contains": {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "const": "source"
+                        },
+                        "status": {
+                          "const": "passed"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "status"
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "evidence_level": {
+            "enum": [
+              "E4_HOLDOUT_SUPPORT",
+              "E5_CROSS_SCOPE_SUPPORT"
+            ]
+          }
+        },
+        "required": [
+          "evidence_level"
+        ]
+      },
+      "then": {
+        "properties": {
+          "validation": {
+            "properties": {
+              "results": {
+                "allOf": [
+                  {
+                    "contains": {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "const": "holdout"
+                        },
+                        "status": {
+                          "const": "passed"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "status"
+                      ]
+                    }
+                  },
+                  {
+                    "contains": {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "const": "negative"
+                        },
+                        "status": {
+                          "const": "passed"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "status"
+                      ]
+                    }
+                  },
+                  {
+                    "contains": {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "const": "compatibility"
+                        },
+                        "status": {
+                          "const": "passed"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "status"
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "evidence_level": {
+            "const": "E5_CROSS_SCOPE_SUPPORT"
+          }
+        },
+        "required": [
+          "evidence_level"
+        ]
+      },
+      "then": {
+        "properties": {
+          "validation": {
+            "properties": {
+              "results": {
+                "contains": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "const": "cross_scope"
+                    },
+                    "status": {
+                      "const": "passed"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "status"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "frozen",
+              "validated"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "validation": {
+            "properties": {
+              "results": {
+                "contains": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "const": "structural"
+                    },
+                    "status": {
+                      "const": "passed"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "status"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "validated"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "evidence_level": {
+            "enum": [
+              "E3_SOURCE_REPLAY",
+              "E4_HOLDOUT_SUPPORT",
+              "E5_CROSS_SCOPE_SUPPORT"
+            ]
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "validation": {
+                  "properties": {
+                    "plan": {
+                      "properties": {
+                        "structural": {
+                          "const": true
+                        }
+                      },
+                      "required": [
+                        "structural"
+                      ]
+                    }
+                  }
+                }
+              },
+              "required": [
+                "validation"
+              ]
+            },
+            "then": {
+              "properties": {
+                "validation": {
+                  "properties": {
+                    "results": {
+                      "contains": {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "const": "structural"
+                          },
+                          "status": {
+                            "const": "passed"
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "status"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "validation": {
+                  "properties": {
+                    "plan": {
+                      "properties": {
+                        "source_replay": {
+                          "const": true
+                        }
+                      },
+                      "required": [
+                        "source_replay"
+                      ]
+                    }
+                  }
+                }
+              },
+              "required": [
+                "validation"
+              ]
+            },
+            "then": {
+              "properties": {
+                "validation": {
+                  "properties": {
+                    "results": {
+                      "contains": {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "const": "source"
+                          },
+                          "status": {
+                            "const": "passed"
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "status"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "validation": {
+                  "properties": {
+                    "plan": {
+                      "properties": {
+                        "holdout": {
+                          "const": true
+                        }
+                      },
+                      "required": [
+                        "holdout"
+                      ]
+                    }
+                  }
+                }
+              },
+              "required": [
+                "validation"
+              ]
+            },
+            "then": {
+              "properties": {
+                "validation": {
+                  "properties": {
+                    "results": {
+                      "contains": {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "const": "holdout"
+                          },
+                          "status": {
+                            "const": "passed"
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "status"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "validation": {
+                  "properties": {
+                    "plan": {
+                      "properties": {
+                        "negative_controls": {
+                          "const": true
+                        }
+                      },
+                      "required": [
+                        "negative_controls"
+                      ]
+                    }
+                  }
+                }
+              },
+              "required": [
+                "validation"
+              ]
+            },
+            "then": {
+              "properties": {
+                "validation": {
+                  "properties": {
+                    "results": {
+                      "contains": {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "const": "negative"
+                          },
+                          "status": {
+                            "const": "passed"
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "status"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "validation": {
+                  "properties": {
+                    "plan": {
+                      "properties": {
+                        "compatibility": {
+                          "const": true
+                        }
+                      },
+                      "required": [
+                        "compatibility"
+                      ]
+                    }
+                  }
+                }
+              },
+              "required": [
+                "validation"
+              ]
+            },
+            "then": {
+              "properties": {
+                "validation": {
+                  "properties": {
+                    "results": {
+                      "contains": {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "const": "compatibility"
+                          },
+                          "status": {
+                            "const": "passed"
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "status"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "validation": {
+                  "properties": {
+                    "plan": {
+                      "properties": {
+                        "cross_scope": {
+                          "const": true
+                        }
+                      },
+                      "required": [
+                        "cross_scope"
+                      ]
+                    }
+                  }
+                }
+              },
+              "required": [
+                "validation"
+              ]
+            },
+            "then": {
+              "properties": {
+                "validation": {
+                  "properties": {
+                    "results": {
+                      "contains": {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "const": "cross_scope"
+                          },
+                          "status": {
+                            "const": "passed"
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "status"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
