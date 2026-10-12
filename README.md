@@ -1,6 +1,6 @@
 # EasyFoam
 
-[中文说明](README_zh.md) | [Paper draft (PDF)](docs/EasyFoam-draft.pdf)
+[中文说明](README_zh.md) | [Paper draft (PDF)](docs/EasyFoam-draft.pdf) | [Project website](https://cas-clab.github.io/EasyFoam/)
 
 EasyFoam is a Skill-based, contract-driven, evidence-oriented CFD workflow library for **OpenFOAM Foundation v13**. It guides a coding agent with file and command execution capabilities through case planning, authoring, execution, recovery, validation, and postprocessing. When explicitly requested by the user, verified workflow experience can also be distilled into reviewed and reversible Skill updates.
 
@@ -147,6 +147,9 @@ References are evidence sources, not automatic answers. Explicit user requiremen
 ├── .env.example
 ├── .gitignore
 ├── docs/
+│   ├── index.html
+│   ├── index_zh.html
+│   ├── static/
 │   └── EasyFoam-draft.pdf
 ├── schemas/
 └── skills/

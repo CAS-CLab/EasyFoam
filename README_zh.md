@@ -1,6 +1,6 @@
 # EasyFoam
 
-[English README](README.md) | [论文初稿（PDF）](docs/EasyFoam-draft.pdf)
+[English README](README.md) | [论文初稿（PDF）](docs/EasyFoam-draft.pdf) | [项目网站](https://cas-clab.github.io/EasyFoam/index_zh.html)
 
 EasyFoam 是一个面向 **OpenFOAM Foundation v13** 的、基于 Skills、固定数据契约和证据链组织的 CFD 工作流库。它用于指导具备文件与命令执行能力的 Coding Agent 构建、恢复、运行、修复、验证和后处理 OpenFOAM case，并在用户明确要求时将经过验证的经验转化为可审核、可回滚的 Skill 更新。
 
@@ -210,6 +210,9 @@ Reference 是证据来源，不是自动答案。用户明确需求和实际 cas
 ├── .env.example
 ├── .gitignore
 ├── docs/
+│   ├── index.html
+│   ├── index_zh.html
+│   ├── static/
 │   └── EasyFoam-draft.pdf
 ├── schemas/
 └── skills/
