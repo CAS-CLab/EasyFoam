@@ -1,6 +1,6 @@
 # EasyFoam
 
-[English README](README.md) | [论文（PDF）](docs/EasyFoam.pdf) | [项目网站](https://cas-clab.github.io/EasyFoam/index_zh.html)
+[English README](README.md) | [论文（PDF）](docs/EasyFoam.pdf) | [项目网站](https://cas-clab.github.io/EasyFoam/index_zh.html) | [数据集（HF）](https://huggingface.co/datasets/Eurus132/ExtFoamBench)
 
 EasyFoam 是一个面向 **OpenFOAM Foundation v13** 的、基于 Skills、固定数据契约和证据链组织的 CFD 工作流库。它用于指导具备文件与命令执行能力的 Coding Agent 构建、恢复、运行、修复、验证和后处理 OpenFOAM case，并在用户明确要求时将经过验证的经验转化为可审核、可回滚的 Skill 更新。
 
@@ -14,6 +14,10 @@ EasyFoam 是一个面向 **OpenFOAM Foundation v13** 的、基于 Skills、固�
 可通过[论文（PDF）](docs/EasyFoam.pdf)阅读。
 本仓库发布可使用的 EasyFoam 库，包括 Workflow、人工审核的 Evolution、Reference、
 确定性脚本和对应 Schema。
+
+## 数据集与评价资源
+
+[ExtFoamBench（Hugging Face）](https://huggingface.co/datasets/Eurus132/ExtFoamBench)独立提供 **100 个 ExtFoamBench 任务、7 个几何资产，以及逐任务评价指标与接受准则**，并附离线参考数据和可选评价工具。配套的 Basic/Advanced 任务继承自 FoamBench；EasyFoam 作者贡献了这些任务的评价准则和离线参考数据。仅使用本仓库的 Skill 时，无需下载数据集。
 
 ## 1. 核心特点
 

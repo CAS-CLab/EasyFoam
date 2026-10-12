@@ -38,6 +38,7 @@ processor[0-9]*/
 dynamicCode/
 
 # Research-only content excluded from the library release.
+/easyfoam-anonymous/
 /benchmarks/
 /baselines/
 /configs/

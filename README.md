@@ -1,6 +1,6 @@
 # EasyFoam
 
-[中文说明](README_zh.md) | [Paper (PDF)](docs/EasyFoam.pdf) | [Project website](https://cas-clab.github.io/EasyFoam/)
+[中文说明](README_zh.md) | [Paper (PDF)](docs/EasyFoam.pdf) | [Project website](https://cas-clab.github.io/EasyFoam/) | [Dataset (HF)](https://huggingface.co/datasets/Eurus132/ExtFoamBench)
 
 EasyFoam is a Skill-based, contract-driven, evidence-oriented CFD workflow library for **OpenFOAM Foundation v13**. It guides a coding agent with file and command execution capabilities through case planning, authoring, execution, recovery, validation, and postprocessing. When explicitly requested by the user, verified workflow experience can also be distilled into reviewed and reversible Skill updates.
 
@@ -14,6 +14,10 @@ The accompanying paper, **EasyFoam: Skill-Oriented OpenFOAM Agents with Evidence
 is available as a [paper PDF](docs/EasyFoam.pdf).
 This repository provides the usable EasyFoam library, including Workflow,
 human-governed Evolution, References, deterministic scripts, and their Schemas.
+
+## Dataset and evaluation resources
+
+[ExtFoamBench on Hugging Face](https://huggingface.co/datasets/Eurus132/ExtFoamBench) provides **100 ExtFoamBench tasks, 7 geometry assets, and task-specific evaluation metrics and acceptance criteria**, with offline reference data and optional evaluation tools. The accompanying Basic/Advanced tasks are inherited from FoamBench; the EasyFoam authors contribute their evaluation criteria and offline reference data. The dataset is distributed separately and is optional for users of this Skill library.
 
 ## 1. Key Features
 
