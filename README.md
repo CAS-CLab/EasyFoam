@@ -1,6 +1,6 @@
 # EasyFoam
 
-[中文说明](README_zh.md) | [Paper draft (PDF)](docs/EasyFoam-draft.pdf) | [Project website](https://cas-clab.github.io/EasyFoam/)
+[中文说明](README_zh.md) | [Paper (PDF)](docs/EasyFoam.pdf) | [Project website](https://cas-clab.github.io/EasyFoam/)
 
 EasyFoam is a Skill-based, contract-driven, evidence-oriented CFD workflow library for **OpenFOAM Foundation v13**. It guides a coding agent with file and command execution capabilities through case planning, authoring, execution, recovery, validation, and postprocessing. When explicitly requested by the user, verified workflow experience can also be distilled into reviewed and reversible Skill updates.
 
@@ -11,7 +11,7 @@ EasyFoam is a Skill-based, contract-driven, evidence-oriented CFD workflow libra
 ## Paper
 
 The accompanying paper, **EasyFoam: Skill-Oriented OpenFOAM Agents with Evidence-Driven Evolution**,
-is available as a [draft PDF](docs/EasyFoam-draft.pdf).
+is available as a [paper PDF](docs/EasyFoam.pdf).
 This repository provides the usable EasyFoam library, including Workflow,
 human-governed Evolution, References, deterministic scripts, and their Schemas.
 
@@ -150,7 +150,7 @@ References are evidence sources, not automatic answers. Explicit user requiremen
 │   ├── index.html
 │   ├── index_zh.html
 │   ├── static/
-│   └── EasyFoam-draft.pdf
+│   └── EasyFoam.pdf
 ├── schemas/
 └── skills/
     ├── SKILL.md
@@ -178,7 +178,8 @@ python -m pip install -r requirements.txt
 Windows PowerShell:
 
 ```powershell
-.venv\Scripts\Activate.ps1
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
 ```
 
@@ -191,13 +192,22 @@ export EASYFOAM_OPENFOAM_BASHRC=/opt/openfoam13/etc/bashrc
 export EASYFOAM_EXEC_BACKEND=auto
 ```
 
+Windows PowerShell (use the installation path inside WSL):
+
+```powershell
+$env:EASYFOAM_OPENFOAM_BASHRC = "/opt/openfoam13/etc/bashrc"
+$env:EASYFOAM_EXEC_BACKEND = "auto"
+```
+
+Replace the example bashrc path with your actual installation path. `.env.example` is a shell configuration example; EasyFoam does not automatically load `.env` files.
+
 `auto` selects WSL on a Windows host and native execution on Linux or inside WSL. `wsl` and `native` may also be selected explicitly.
 
 ```bash
 python skills/_shared/scripts/openfoam_env.py discover
 ```
 
-A successful result reports backend, platform, OpenFOAM version `13`, and paths for `foamRun`, `blockMesh`, `checkMesh`, and `foamPostProcess` when available. Use the Foundation release; OpenCFD releases require a separate adapter. Parallel execution requires MPI. ParaView `pvpython` is optional for requested visual diagnostics. `.env.example` documents the OpenFOAM variables; set them in the shell used by your agent.
+A successful result reports backend, platform, OpenFOAM version `13`, and paths for `foamRun`, `blockMesh`, `checkMesh`, and `foamPostProcess` when available. Use the Foundation release; OpenCFD releases require a separate adapter. Parallel execution requires MPI. ParaView `pvpython` is optional for requested visual diagnostics. Video validation additionally requires FFmpeg with `ffprobe` available on PATH in the shell running the validation script. `.env.example` documents the OpenFOAM variables; set them in the shell used by your agent.
 
 ## 11. Quick Start
 

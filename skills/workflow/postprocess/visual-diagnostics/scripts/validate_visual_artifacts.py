@@ -9,7 +9,15 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any
 
-IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".tif", ".tiff", ".webp"}
+IMAGE_FORMATS = {
+    ".png": "PNG",
+    ".jpg": "JPEG",
+    ".jpeg": "JPEG",
+    ".tif": "TIFF",
+    ".tiff": "TIFF",
+    ".webp": "WEBP",
+}
+IMAGE_SUFFIXES = set(IMAGE_FORMATS)
 VIDEO_SUFFIXES = {".avi", ".mp4"}
 STATE_SUFFIXES = {".pvsm"}
 ALLOWED = IMAGE_SUFFIXES | VIDEO_SUFFIXES | STATE_SUFFIXES
@@ -28,9 +36,9 @@ def _image_metadata(path: Path) -> dict[str, Any]:
         from PIL import Image
     except ImportError as exc:
         raise RuntimeError("Pillow is required to validate image readability") from exc
-    with Image.open(path) as image:
+    with Image.open(path, formats=[IMAGE_FORMATS[path.suffix.lower()]]) as image:
         image.verify()
-    with Image.open(path) as image:
+    with Image.open(path, formats=[IMAGE_FORMATS[path.suffix.lower()]]) as image:
         return {"width": image.width, "height": image.height, "format": image.format}
 
 

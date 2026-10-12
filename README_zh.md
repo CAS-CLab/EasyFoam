@@ -1,17 +1,17 @@
 # EasyFoam
 
-[English README](README.md) | [论文初稿（PDF）](docs/EasyFoam-draft.pdf) | [项目网站](https://cas-clab.github.io/EasyFoam/index_zh.html)
+[English README](README.md) | [论文（PDF）](docs/EasyFoam.pdf) | [项目网站](https://cas-clab.github.io/EasyFoam/index_zh.html)
 
 EasyFoam 是一个面向 **OpenFOAM Foundation v13** 的、基于 Skills、固定数据契约和证据链组织的 CFD 工作流库。它用于指导具备文件与命令执行能力的 Coding Agent 构建、恢复、运行、修复、验证和后处理 OpenFOAM case，并在用户明确要求时将经过验证的经验转化为可审核、可回滚的 Skill 更新。
 
 > EasyFoam 不是新的 CFD 求解器，也不是单体的一键式 CLI。OpenFOAM 负责数值求解；EasyFoam 负责把用户需求、CaseSpec、case 文件、运行尝试、验证证据和可复用修复组织成可追踪的工程流程。
 
-> **项目状态：工程研究版本。** 当前正式合同主要覆盖 OpenFOAM Foundation v13 单区域工作流。用于生产设计、认证、安全关键分析或高成本工程决策前，仍应由具备相应资质的 CFD 工程师审核网格、模型、数值方法和证据结论。
+> **项目状态：工程研究版本。** 当前正式约束主要覆盖 OpenFOAM Foundation v13 单区域工作流。用于生产设计、认证、安全关键分析或高成本工程决策前，仍应由具备相应资质的 CFD 工程师审核网格、模型、数值方法和证据结论。
 
 ## 论文
 
 配套论文 **EasyFoam: Skill-Oriented OpenFOAM Agents with Evidence-Driven Evolution**
-可通过[论文初稿（PDF）](docs/EasyFoam-draft.pdf)阅读。
+可通过[论文（PDF）](docs/EasyFoam.pdf)阅读。
 本仓库发布可使用的 EasyFoam 库，包括 Workflow、人工审核的 Evolution、Reference、
 确定性脚本和对应 Schema。
 
@@ -22,7 +22,7 @@ EasyFoam 是一个面向 **OpenFOAM Foundation v13** 的、基于 Skills、固�
 - **需求驱动的 CaseSpec**：CaseSpec 只能来源于当前自然语言需求或用户提供的 TXT 文件地址。
 - **决定性信息不猜测**：缺失或矛盾的信息保持为 blocking review item，并由 Agent 向用户提出具体问题；用户补充后继续完善同一 CaseSpec。
 - **OpenFOAM v13 明确契约**：覆盖 solver module、fields、dictionaries、mesh、run controls、QoIs 和 postprocessing。
-- **分层证据声明**：文件正确、mesh 合同、执行成功、数值可信、物理可信和 QoI 验证分别判断。
+- **分层证据声明**：文件正确、网格约束、执行成功、数值可信、物理可信和 QoI 验证分别判断。
 - **可恢复状态**：`workflow.json` 记录最小权威状态；`advance` 原子完成并路由阶段，`reopen` 使最早受影响阶段及其下游结论失效。
 - **最小加载原则**：一次只加载一个活动阶段、一个活动专家 Skill 和当前决策所需的最少 Reference。
 - **可回滚进化**：冻结 patch、分级验证、人工授权、保留检查和 rollback 相互分离。
@@ -35,7 +35,7 @@ EasyFoam 是一个面向 **OpenFOAM Foundation v13** 的、基于 Skills、固�
 - 单区域 CFD 工作流；
 - Windows 主机通过 WSL 执行 OpenFOAM；
 - Linux 或 WSL 会话中原生执行 OpenFOAM；
-- 生成、导入或复用 mesh，并显式维护 patch、zone、interface 和质量合同；
+- 生成、导入或复用 mesh，并显式维护 patch、zone、interface 和质量约束；
 - Agent 协调的 case 构建、运行、诊断、验证、可视化和恢复；
 - 对 Skill、Reference、脚本和 Schema 进行证据关联、人工治理和可回滚的修改。
 
@@ -190,7 +190,7 @@ Reference 是证据来源，不是自动答案。用户明确需求和实际 cas
 
 | Artifact | Schema 版本 | 所有者 | 作用 |
 | --- | ---: | --- | --- |
-| `case_spec.json` | 1.2 | Plan / case-planning | 需求来源、仿真合同、provenance 和 review items |
+| `case_spec.json` | 1.2 | Plan / case-planning | 需求来源、仿真规范、provenance 和 review items |
 | `workflow.json` | 2.2 | Workflow ledger | 阶段、Artifact、stage-scoped evidence、阻塞项与下一步 |
 | `runs/<attempt_id>/run_record.json` | 1.1 | Run / runner | 不可变环境、命令、终止、哈希和 restart 证据 |
 | `evidence_summary.json` | 2.1 | Postprocess / physics-validation | 最终有边界的评估与最高可支持声明 |
@@ -213,7 +213,7 @@ Reference 是证据来源，不是自动答案。用户明确需求和实际 cas
 │   ├── index.html
 │   ├── index_zh.html
 │   ├── static/
-│   └── EasyFoam-draft.pdf
+│   └── EasyFoam.pdf
 ├── schemas/
 └── skills/
     ├── SKILL.md
@@ -245,7 +245,8 @@ python -m pip install -r requirements.txt
 Windows PowerShell：
 
 ```powershell
-.venv\Scripts\Activate.ps1
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
 ```
 
@@ -265,6 +266,15 @@ export EASYFOAM_EXEC_BACKEND=auto     # 默认
 # 也可显式设为 wsl 或 native
 ```
 
+Windows PowerShell（使用 WSL 内可见的安装路径）：
+
+```powershell
+$env:EASYFOAM_OPENFOAM_BASHRC = "/opt/openfoam13/etc/bashrc"
+$env:EASYFOAM_EXEC_BACKEND = "auto"
+```
+
+请将示例 bashrc 路径替换为实际安装路径。`.env.example` 是 shell 配置示例，EasyFoam 不会自动加载 `.env` 文件。
+
 检查环境：
 
 ```bash
@@ -278,7 +288,7 @@ python skills/_shared/scripts/openfoam_env.py discover
 - `foamRun`、`blockMesh` 和 `checkMesh` 可用；
 - `foamPostProcess` 路径会同时报告，供后处理使用。
 
-此处要求 Foundation 发行版；OpenCFD 发行版需要单独适配。并行执行需要 MPI；按需生成可视化时需要 ParaView `pvpython`。`.env.example` 提供 OpenFOAM 环境变量示例，请在 Agent 使用的 shell 中设置。
+此处要求 Foundation 发行版；OpenCFD 发行版需要单独适配。并行执行需要 MPI；按需生成可视化时需要 ParaView `pvpython`。校验视频文件还需要 FFmpeg，并确保运行校验脚本的 shell 能通过 PATH 找到 `ffprobe`。`.env.example` 提供 OpenFOAM 环境变量示例，请在 Agent 使用的 shell 中设置。
 
 Windows 中应从 Windows Python/Agent 启动，并确保 WSL 内已安装 OpenFOAM v13。Linux 或 WSL 内部直接使用 native backend。
 
@@ -379,7 +389,7 @@ Evolution 目录：
 
 ## 14. 当前限制
 
-- 当前自动门槛以单区域合同为主；复杂模型仍需要专家审核。
+- 当前自动门槛以单区域约束为主；复杂模型仍需要专家审核。
 - 复杂几何不应由 Agent 用简单盒体替代；必须提供真实 CAD、surface 或 mesh。
 - 一个 mesh 不能证明 mesh independence。
 - solver 运行完成不能证明数值收敛或物理可信。
